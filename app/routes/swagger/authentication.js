@@ -53,13 +53,9 @@
  *          CheckOtp:
  *              type: object
  *              required:
- *                  -   phoneNumber
  *                  -   code
  *                  -   newPassword
  *              properties:
- *                  phoneNumber:
- *                      type: string
- *                      description: the user's phoneNumber for login
  *                  code:
  *                      type: string
  *                      description: the user's otp for login 

@@ -1,9 +1,10 @@
-const { signUp, verifyEmail, login } = require("../../validator/authenticationSchema")
+const { signUp, verifyEmail, login, sendOtp, checkOtp } = require("../../validator/authenticationSchema")
 const { StatusCodes: HttpStatus } = require('http-status-codes')
 const Controller = require("../MainController")
 const Error = require("http-errors")
 const { hashPassword, RandomNumber, sendCode, verifyPassword, AccessToken } = require("../../utils/functions")
 const { UserModel } = require("../../model/user")
+const { sendTwilioMessage } = require("../../module/twilio")
 
 
 class UserAuthController extends Controller{
@@ -79,6 +80,56 @@ async login(req, res, next){
             }
           })
 
+    } catch (error) {
+        next(error)
+    }
+}
+async ForgetPass(req, res, next){
+    try {
+        await sendOtp.validateAsync(req.body)
+        const { phoneNumber } = req.body
+        const user = await UserModel.findOne({phoneNumber})
+        if(user){
+            sendTwilioMessage(phoneNumber)
+            res.cookie('phone-Number', phoneNumber, {maxAge: 86400000})
+
+        }else{
+            throw Error.NotFound("No users were found with the entered phone number")
+        }
+        return res.status(HttpStatus.OK).json({
+            statusCode: HttpStatus.OK,
+            data: {
+              message: "The code has been successfully sent to you. Please enter the received code.",
+            }
+          })
+
+    } catch (error) {
+        next(error)
+    }
+}
+async checkotp (req, res, next){
+    try {
+        await checkOtp.validateAsync(req.body)
+        const { code, newPassword  } = req.body
+        const phoneNumber = req.cookies['phone-Number']
+        const findUser = await UserModel.findOne({phoneNumber})
+        let Access = ""
+        if(findUser.otp == code){
+            const access = await AccessToken(findUser._id)
+            Access = access
+        }else{
+            throw Error.BadGateway("The code entered does not match the code sent")
+        }
+        res.cookie('Access-Token', Access, {maxAge: 43200000 })
+        const password = hashPassword(newPassword)
+        const updateUser = await UserModel.updateOne({phoneNumber: phoneNumber}, {$set: {password: password}})
+        return res.status(HttpStatus.OK).json({
+            statusCode: HttpStatus.OK,
+            data: {
+              message: 'login was successful',
+              Access,
+            }
+          })
     } catch (error) {
         next(error)
     }
