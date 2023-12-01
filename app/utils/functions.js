@@ -70,17 +70,6 @@ function AccessToken(Id) {
   })
 }
 
-function otpExpire(otpCode){
-  const otpExpirationTime = 60 * 1000; 
-  
-  function expireOTP() {
-      otpCode = null; 
-      return new Error[410]
-  }
-
-  const otpTimer = setTimeout(expireOTP, otpExpirationTime);
-}
-
 
 
 module.exports = {
@@ -89,5 +78,4 @@ module.exports = {
     sendCode,
     RandomNumber,
     AccessToken,
-    otpExpire
 }

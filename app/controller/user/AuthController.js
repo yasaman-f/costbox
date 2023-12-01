@@ -2,7 +2,7 @@ const { signUp, verifyEmail, login, sendOtp, checkOtp } = require("../../validat
 const { StatusCodes: HttpStatus } = require('http-status-codes')
 const Controller = require("../MainController")
 const Error = require("http-errors")
-const { hashPassword, RandomNumber, sendCode, verifyPassword, AccessToken, otpExpire } = require("../../utils/functions")
+const { hashPassword, RandomNumber, sendCode, verifyPassword, AccessToken } = require("../../utils/functions")
 const { UserModel } = require("../../model/user")
 const { sendTwilioMessage } = require("../../module/twilio")
 
