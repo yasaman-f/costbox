@@ -2,7 +2,7 @@ const { signUp, verifyEmail, login, sendOtp, checkOtp } = require("../../validat
 const { StatusCodes: HttpStatus } = require('http-status-codes')
 const Controller = require("../MainController")
 const Error = require("http-errors")
-const { hashPassword, RandomNumber, sendCode, verifyPassword, AccessToken } = require("../../utils/functions")
+const { hashPassword, RandomNumber, sendCode, verifyPassword, AccessToken, otpExpire } = require("../../utils/functions")
 const { UserModel } = require("../../model/user")
 const { sendTwilioMessage } = require("../../module/twilio")
 
@@ -17,8 +17,10 @@ async signUp(req, res, next){
         if(findUsername) throw new Error.BadRequest("This username already exists")
         const findUser = await UserModel.findOne({phoneNumber : data.phoneNumber})
         if(findUser) throw new Error.BadRequest("This user already exists")
-        data.otp = RandomNumber()
-        sendCode(data.email, data.otp )
+        const code = RandomNumber() 
+        data.otp =  { code, expire: (new Date().getTime() + 120000)}
+        
+        sendCode(data.email, data.otp.code )
         const createUser = await UserModel.create(data)
         res.cookie('User-Information', data.email, {maxAge: 86400000 })
         return res.status(HttpStatus.OK).json({
@@ -39,12 +41,14 @@ async verifyEmail(req, res , next){
         const email = req.cookies['User-Information']
         const findUser = await UserModel.findOne({email})
         let Access = ""
-        if(findUser.otp == code){
+        if(findUser.otp.code == code){
             const access = await AccessToken(findUser._id)
             Access = access
         }else{
             throw Error.BadGateway("The code entered does not match the code sent")
         }
+        if (+findUser.otp.expire < (Date.now())) throw Error.Unauthorized('code is expire please try again')
+      
         res.cookie('Access-Token', Access, {maxAge: 43200000 })
         return res.status(HttpStatus.OK).json({
             statusCode: HttpStatus.OK,
@@ -92,7 +96,7 @@ async ForgetPass(req, res, next){
         if(user){
             sendTwilioMessage(phoneNumber)
             res.cookie('phone-Number', phoneNumber, {maxAge: 86400000})
-
+            
         }else{
             throw Error.NotFound("No users were found with the entered phone number")
         }
@@ -114,6 +118,7 @@ async checkotp (req, res, next){
         const phoneNumber = req.cookies['phone-Number']
         const findUser = await UserModel.findOne({phoneNumber})
         let Access = ""
+        if (+findUser.otp.expire < (Date.now())) throw Error.Unauthorized('code is expire please try again')
         if(findUser.otp == code){
             const access = await AccessToken(findUser._id)
             Access = access
@@ -121,6 +126,8 @@ async checkotp (req, res, next){
             throw Error.BadGateway("The code entered does not match the code sent")
         }
         res.cookie('Access-Token', Access, {maxAge: 43200000 })
+        if (+findUser.otp.expire < (Date.now())) throw Error.Unauthorized('code is expire please try again')
+
         const password = hashPassword(newPassword)
         const updateUser = await UserModel.updateOne({phoneNumber: phoneNumber}, {$set: {password: password}})
         return res.status(HttpStatus.OK).json({

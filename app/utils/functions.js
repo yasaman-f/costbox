@@ -3,6 +3,8 @@ const dotenv = require("dotenv")
 const nodemailer = require("nodemailer")
 const { UserModel } = require("../model/user")
 const jwt = require("jsonwebtoken")
+const Error = require("http-errors")
+
 
 dotenv.config()
 
@@ -52,7 +54,6 @@ function RandomNumber() {
     return Math.floor((Math.random() * 90000) + 10000)
 }
 
-
 function AccessToken(Id) {
   return new Promise(async (resolve, reject) => {
       const user = await UserModel.findById(Id)
@@ -69,10 +70,24 @@ function AccessToken(Id) {
   })
 }
 
+function otpExpire(otpCode){
+  const otpExpirationTime = 60 * 1000; 
+  
+  function expireOTP() {
+      otpCode = null; 
+      return new Error[410]
+  }
+
+  const otpTimer = setTimeout(expireOTP, otpExpirationTime);
+}
+
+
+
 module.exports = {
     hashPassword,
     verifyPassword,
     sendCode,
     RandomNumber,
-    AccessToken
+    AccessToken,
+    otpExpire
 }
