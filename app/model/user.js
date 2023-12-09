@@ -10,13 +10,8 @@ const user = new mongoose.Schema({
     otp: { type: Object, default: { code: 0, expire:0 } },
     role: { type: String, default: "USER" },
 }, {
-    timestamps: true,
-    toJSON: {
-        virtuals: true
-    }
+    timestamps: true
 });
-
-user.index({firstName: "text", lastName: "text", userName:"text", email: "text", phoneNumber: "text"})
 
 const UserModel = mongoose.model('user', user)
 
