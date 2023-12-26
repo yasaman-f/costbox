@@ -5,40 +5,32 @@
  *          SignUp:
  *              type: object
  *              required:
- *                  -   firstName
- *                  -   lastName
  *                  -   userName
- *                  -   phoneNumber
  *                  -   email
  *                  -   password
+ *                  -   repeatPassword
  *              properties:
- *                  firstName:
- *                      type: string
- *                      description: the user's firstName for signup
- *                  lastName:
- *                      type: string
- *                      description: the user's lastName for signup
  *                  userName:
  *                      type: string
  *                      description: the user's userName for signup
- *                  phoneNumber:
- *                      type: string
- *                      description: the user's phoneNumber for signup
  *                  email:
  *                      type: string
  *                      description: the user's email for signup
  *                  password:
  *                      type: string
  *                      description: the user's password for signup
+ *                  repeatPassword:
+ *                      type: string
+ *                      description: the user's repeatPassword for signup
  *          Login:
  *              type: object
  *              required:
- *                  -   phoneNumber
+ *                  -   email
  *                  -   password
  *              properties:
- *                  phoneNumber:
+ *                  email:
  *                      type: string
- *                      description: the user's phoneNumber for login
+ *                      description: the user's email for login
  *                  password:
  *                      type: string
  *                      description: the user's password for login

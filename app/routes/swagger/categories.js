@@ -2,40 +2,70 @@
  * @swagger
  *  components:
  *      schemas:
+ *          Types:
+ *              type: array
+ *              items: 
+ *                  type: string
+ *                  enum:
+ *                      -   Income
+ *                      -   Saving
+ */ 
+
+/**
+ * @swagger
+ *  components:
+ *      schemas:
  *          CreateCategory:
  *              type: object
  *              required:
  *                  -   title
- *                  -   minimumConsumption
- *                  -   maximumConsumption
+ *                  -   description
+ *                  -   amountOfSpend
  *              properties:
  *                  title:
  *                      type: string
  *                      description: the title for Category
- *                  minimumConsumption:
+ *                  description:
  *                      type: string
- *                      description: the minimum Consumption for Category
- *                  maximumConsumption:
+ *                      description: the description for Category
+ *                  amountOfSpend:
  *                      type: string
- *                      description: the maximum Consumption for Category
+ *                      description: the amountOfSpend for Category
+ *                  type:
+ *                      $ref: '#/components/schemas/Types'
+ *                  parent:
+ *                      type: string
+ *                      description: the parent for Category
+ *                  children:
+ *                      type: string
+ *                      description: the children for Category
  *          UpdateCategory:
  *              type: object
  *              properties:
  *                  title:
  *                      type: string
  *                      description: the title for Category
- *                  minimumConsumption:
+ *                  description:
  *                      type: string
- *                      description: the minimum Consumption for Category
- *                  maximumConsumption:
+ *                      description: the description for Category
+ *                  amountOfSpend:
  *                      type: string
- *                      description: the maximum Consumption for Category
+ *                      description: the amountOfSpend for Category 
+ *                  type:
+ *                      type: string
+ *                      description: the type for Category 
+ *                  parent:
+ *                      type: string
+ *                      description: the maximum Consumption for Category 
+ *                  children:
+ *                      type: string
+ *                      description: the maximum Consumption for Category 
  */
 
 
 /**
  * @swagger
- *  /category/create:
+ *  /category/add:
  *      post:
  *          tags: [Category]
  *          description: create category

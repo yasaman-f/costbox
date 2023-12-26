@@ -2,9 +2,10 @@ const { signUp, verifyEmail, login, sendOtp, checkOtp } = require("../../validat
 const { StatusCodes: HttpStatus } = require('http-status-codes')
 const Controller = require("../MainController")
 const Error = require("http-errors")
-const { hashPassword, RandomNumber, sendCode, verifyPassword, AccessToken } = require("../../utils/functions")
+const { hashPassword, RandomNumber, verifyPassword, AccessToken } = require("../../utils/functions")
 const { UserModel } = require("../../model/user")
 const { sendTwilioMessage } = require("../../module/twilio")
+const { sendCode } = require("../../module/nodemailer")
 
 
 class UserAuthController extends Controller{
@@ -12,15 +13,20 @@ async signUp(req, res, next){
     try {
         await signUp.validateAsync(req.body)
         const data = req.body
-        data.password = hashPassword(data.password)
+        if(data.password == data.repeatPassword){
+            data.password = hashPassword(data.password)
+        }else{
+            throw new Error.BadRequest("Repeating password does not match with password")
+        }
         const findUsername = await UserModel.findOne({userName : data.userName})
         if(findUsername) throw new Error.BadRequest("This username already exists")
-        const findUser = await UserModel.findOne({phoneNumber : data.phoneNumber})
+        const findUser = await UserModel.findOne({email : data.email})
         if(findUser) throw new Error.BadRequest("This user already exists")
         const code = RandomNumber() 
         data.otp =  { code, expire: (new Date().getTime() + 120000)}
         
         sendCode(data.email, data.otp.code )
+        delete data.repeatPassword;
         const createUser = await UserModel.create(data)
         res.cookie('User-Information', data.email, {maxAge: 86400000 })
         return res.status(HttpStatus.OK).json({
@@ -64,8 +70,8 @@ async verifyEmail(req, res , next){
 async login(req, res, next){
     try {
         await login.validateAsync(req.body)
-        const { phoneNumber, password  } = req.body
-        const findUser = await UserModel.findOne({phoneNumber})
+        const { email, password  } = req.body
+        const findUser = await UserModel.findOne({email})
         if(!findUser) throw Error.NotFound("No users were found with the entered information")
         const checkPass = verifyPassword(password, findUser.password)
         let Access = ""
