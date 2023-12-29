@@ -2,19 +2,6 @@
  * @swagger
  *  components:
  *      schemas:
- *          Types:
- *              type: array
- *              items: 
- *                  type: string
- *                  enum:
- *                      -   Income
- *                      -   Saving
- */ 
-
-/**
- * @swagger
- *  components:
- *      schemas:
  *          CreateCategory:
  *              type: object
  *              required:
@@ -31,8 +18,6 @@
  *                  amountOfSpend:
  *                      type: string
  *                      description: the amountOfSpend for Category
- *                  type:
- *                      $ref: '#/components/schemas/Types'
  *                  parent:
  *                      type: string
  *                      description: the parent for Category
@@ -51,9 +36,6 @@
  *                  amountOfSpend:
  *                      type: string
  *                      description: the amountOfSpend for Category 
- *                  type:
- *                      type: string
- *                      description: the type for Category 
  *                  parent:
  *                      type: string
  *                      description: the maximum Consumption for Category 

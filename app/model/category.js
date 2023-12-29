@@ -4,8 +4,7 @@ const categories = new mongoose.Schema({
     title: { type: String },
     description: { type: String },
     amountOfSpend: { type: String, default: "0" },
-    type: { type: String, default: "Income" },
-    userID: { type: String, lowercase: true },
+    userID: { type: mongoose.Types.ObjectId },
     parent: { type: mongoose.Types.ObjectId },
     children: { type: [ mongoose.Types.ObjectId ], default: [] }
 }, {

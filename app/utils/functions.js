@@ -55,6 +55,10 @@ function removeExtraData(data, fixedData = []) {
     return data
 }
 
+function covertStringToArray(data) {
+
+}
+
 
 
 module.exports = {
