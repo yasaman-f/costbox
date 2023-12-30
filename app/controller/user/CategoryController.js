@@ -1,7 +1,7 @@
 const { StatusCodes: HttpStatus } = require('http-status-codes')
 const Controller = require("../MainController")
 const Error = require("http-errors")
-const { createCategory } = require('../../validator/categorySchema')
+const { createCategory, editCategory } = require('../../validator/categorySchema')
 const { CategoryModel } = require('../../model/category')
 const { removeExtraData } = require('../../utils/functions')
 
@@ -42,11 +42,10 @@ class CategoryController extends Controller{
             if (search) dataBase['$text'] = { $search: search }  
             const categories = await CategoryModel.find(dataBase)
             const iterateCategories = async (categories) => {
-                const result = [];
-    
+                const result = []
+
                 for (const category of categories) {
                     const subcategories = await CategoryModel.find({ parent: category._id }, {title: 1, description: 1 });
-    
                     if (subcategories.length > 0) {
                         const subcategoryData = await iterateCategories(subcategories);
                         result.push({ category, subcategories: subcategoryData });
@@ -54,7 +53,6 @@ class CategoryController extends Controller{
                         result.push({ category });
                     }
                 }
-    
                 return result;
             };
     
@@ -70,7 +68,27 @@ class CategoryController extends Controller{
             next(error)
         }
     }
-    
+    async editCategory(req, res, next){
+        try {
+            await editCategory.validateAsync(req.body)
+            const data = req.body
+            removeExtraData(data)
+            const { CategoryID } = req.params
+            const category = await CategoryModel.findById(CategoryID)
+            if(!category) throw Error.NotFound("this category not exist")
+            const updateCategory = await CategoryModel.updateOne({_id: category._id}, {$set: data})
+            if(!updateCategory.modifiedCount) throw Error.BadRequest("please select item and edit it")
+            return res.status(HttpStatus.OK).json({
+                StatusCode: HttpStatus.OK,
+                data: {
+                    message: "category's update was successfully"
+                }
+            });
+
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 module.exports = {
