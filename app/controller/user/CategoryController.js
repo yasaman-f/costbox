@@ -77,6 +77,11 @@ class CategoryController extends Controller{
             const category = await CategoryModel.findById(CategoryID)
             if(!category) throw Error.NotFound("this category not exist")
             const updateCategory = await CategoryModel.updateOne({_id: category._id}, {$set: data})
+        
+            if(data.parent){
+                const changeParent = await CategoryModel.updateOne({_id: category.parent}, {$pull: {children: category._id}})
+                const newParent = await CategoryModel.updateOne({_id: data.parent}, {$push: {children: category._id}})
+            }
             if(!updateCategory.modifiedCount) throw Error.BadRequest("please select item and edit it")
             return res.status(HttpStatus.OK).json({
                 StatusCode: HttpStatus.OK,
