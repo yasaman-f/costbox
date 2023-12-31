@@ -1,7 +1,7 @@
 const { StatusCodes: HttpStatus } = require('http-status-codes')
 const Controller = require("../MainController")
 const Error = require("http-errors")
-const { createCategory, editCategory } = require('../../validator/categorySchema')
+const { createCategory, editCategory, removeCategory } = require('../../validator/categorySchema')
 const { CategoryModel } = require('../../model/category')
 const { removeExtraData } = require('../../utils/functions')
 
@@ -90,6 +90,27 @@ class CategoryController extends Controller{
                 }
             });
 
+        } catch (error) {
+            next(error)
+        }
+    }
+    async removeCategory(req, res , next){
+        try {
+            await removeCategory.validateAsync(req.body)
+            const { CategoryID } = req.params
+            const category = await CategoryModel.findOne({_id: CategoryID})
+            if(category.parent){
+                const removeChildren = await CategoryModel.updateOne({_id: category.parent}, {$pull: {children: category._id}})
+            }
+            if(!category) throw Error.NotFound("the category not found")
+            const deleteCategory = await CategoryModel.deleteOne({_id: CategoryID})
+            if(!deleteCategory.deletedCount) throw Error.InternalServerError("The category could not be deleted") 
+            return res.status(HttpStatus.OK).json({
+                StatusCode: HttpStatus.OK,
+                data: {
+                    message: "category's delete was successfully"
+                }
+            });
         } catch (error) {
             next(error)
         }
