@@ -11,3 +11,10 @@
  *  name: Category
  *  description: This section is for create, get, edit and delete category
  */
+
+/**
+ * @swagger
+ * tags:
+ *  name: Users
+ *  description: This section is for user information
+ */

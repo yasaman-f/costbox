@@ -8,6 +8,7 @@ const user = new mongoose.Schema({
     email: { type: String, lowercase: true },
     password: { type: String },
     categories: { type: [String] },
+    profile: { type: String },
     otp: { type: Object, default: { code: 0, expire:0 } },
     role: { type: String, default: "USER" },
 }, {
