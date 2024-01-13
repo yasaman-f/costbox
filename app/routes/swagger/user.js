@@ -34,14 +34,14 @@
 
 /**
  * @swagger
- *  /users/add/{userID}:
+ *  /users/add:
  *      post:
  *          tags: [Users]
  *          description: create user
  *          requestBody:
  *              required: true
  *              content: 
- *                  application/x-www-form-urlencoded:
+ *                  multipart/form-data:
  *                      schema:
  *                          $ref: '#/components/schemas/CreateUser'
  *                  application/json:
