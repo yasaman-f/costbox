@@ -125,7 +125,7 @@ async checkotp (req, res, next){
         const findUser = await UserModel.findOne({phoneNumber})
         let Access = ""
         if (+findUser.otp.expire < (Date.now())) throw Error.Unauthorized('code is expire please try again')
-        if(findUser.otp == code){
+        if(findUser.otp.code == code){
             const access = await AccessToken(findUser._id)
             Access = access
         }else{

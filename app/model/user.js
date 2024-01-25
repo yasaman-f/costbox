@@ -7,13 +7,16 @@ const user = new mongoose.Schema({
     phoneNumber: { type: String },
     email: { type: String, lowercase: true },
     password: { type: String },
-    categories: { type: [String] },
+    categories: { type: [String], ref: "categories" },
     profile: { type: String },
     otp: { type: Object, default: { code: 0, expire:0 } },
     role: { type: String, default: "USER" },
 }, {
     timestamps: true
 });
+
+user.index({userName: "text"}, {firstName: "text"}, {lastName: "text"}, {phoneNumber: "text"})
+
 
 const UserModel = mongoose.model('user', user)
 

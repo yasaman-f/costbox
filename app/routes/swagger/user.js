@@ -59,6 +59,85 @@
  */
 
 
+/**
+ * @swagger
+ *  /users/get:
+ *      get:
+ *          tags: [Users]
+ *          description: Get all users
+ *          parameters:
+ *              -   in: query
+ *                  name: search
+ *                  type: string
+ *                  description: text for search user
+ *          responses:
+ *              201: 
+ *                  description: Success
+ *              400: 
+ *                  description: Bad Request
+ *              401: 
+ *                  description: Unauthorization
+ *              500: 
+ *                  description: Internal Server Error 
+ */
+
+/**
+ * @swagger
+ *  /users/userHome:
+ *      get:
+ *          tags: [Users]
+ *          description: user page
+ *          responses:
+ *              201: 
+ *                  description: Success
+ *              400: 
+ *                  description: Bad Request
+ *              401: 
+ *                  description: Unauthorization
+ *              500: 
+ *                  description: Internal Server Error 
+ */
+
+
+/**
+ * @swagger
+ *  /users/removeByAdmin/{userID}:
+ *      delete:
+ *          tags: [Users]
+ *          description: delete user by owner
+ *          parameters:
+ *              -   in: path
+ *                  name: userID
+ *                  type: string
+ *                  description: objectId of product
+ *          responses:
+ *              201: 
+ *                  description: Success
+ *              400: 
+ *                  description: Bad Request
+ *              401: 
+ *                  description: Unauthorization
+ *              500: 
+ *                  description: Internal Server Error 
+ */
+
+/**
+ * @swagger
+ *  /users/removeUser:
+ *      delete:
+ *          tags: [Users]
+ *          description: delete user 
+ *          responses:
+ *              201: 
+ *                  description: Success
+ *              400: 
+ *                  description: Bad Request
+ *              401: 
+ *                  description: Unauthorization
+ *              500: 
+ *                  description: Internal Server Error 
+ */
+
 module.exports = {
     UserAuthRoutes: router
 }

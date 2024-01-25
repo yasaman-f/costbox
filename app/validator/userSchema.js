@@ -8,10 +8,13 @@ const informationSchema = joi.object({
     email: joi.string().lowercase().trim().required().email().error(new Error("email is incorrect")),
     filename: joi.string().regex(/(\.png|\.jpg|\.webp|\.jpeg|\.gif)$/).error(Error("filename incorrect")),
     fileUploadPath : joi.allow(),
-}, {
-    timestamps: true
 });
 
+const deleteUser = joi.object({
+    userID: joi.string().regex(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i).error(new Error("the userID is incorrect"))
+})
+
 module.exports = {
-    informationSchema
+    informationSchema,
+    deleteUser
 }

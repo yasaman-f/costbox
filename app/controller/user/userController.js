@@ -2,10 +2,12 @@ const { StatusCodes: HttpStatus } = require('http-status-codes')
 const Controller = require("../MainController")
 const Error = require("http-errors")
 const path = require("path")
-const { informationSchema } = require('../../validator/userSchema')
+const { informationSchema, deleteUser } = require('../../validator/userSchema')
 const { UserModel } = require('../../model/user')
 const { AccessToken } = require('../../utils/functions')
 const dotenv = require("dotenv")
+const { default: mongoose } = require('mongoose')
+const ObjectId = mongoose.Types.ObjectId
 
 dotenv.config()
 
@@ -41,7 +43,7 @@ class UserController extends Controller{
                     if(findNumber?._id.valueOf() != findUser._id.valueOf() ) throw Error.BadRequest("user already exist")
                 }
             }
-            const createUser = await UserModel.updateOne({_id : findUser["_id"]}, {$set: data})
+            const createUser = await UserModel.updateOne({_id : findUser._id}, {$set: data})
 
             const access = await AccessToken(_id)
             res.cookie('Access-Token', access, {maxAge: 43200000 })
@@ -55,9 +57,94 @@ class UserController extends Controller{
             next(error)
         }
     }
-    async getUser(req, res, next){
+    async getUserHome(req, res, next){
         try {
-              
+            const {_id} = req.user
+            const objectId = new ObjectId(_id)
+
+            const user = await UserModel.aggregate([
+                {
+                  $match: {_id: objectId}
+                },
+                {
+                    $lookup: {
+                      from: "categories",
+                      foreignField: "userID",
+                      localField: "_id",
+                      as: "categories"
+                    }
+                },
+                {
+                  $project: {
+                      "categories.__v": 0,
+                      "categories.updatedAt": 0,
+                      "password": 0,
+                      "otp": 0,
+                      "__v": 0,
+                      "updatedAt": 0,
+                  }
+              }
+                ])
+                if(!user) throw Error.NotFound("No user found")
+
+            return res.status(HttpStatus.OK).json({
+                data: {
+                    user
+                }
+            })
+            
+        } catch (error) {
+            next(error)
+        }
+    }
+    async findUser(req, res, next){
+        try {
+            const { search } = req.query
+            const dataBase = {}
+            if (search) dataBase['$text'] = { $search: search }  
+            const user = await UserModel.find(dataBase, {_id : 0, password : 0, otp: 0})
+
+            if(!user) throw Error.NotFound("user not found")
+            return res.status(HttpStatus.OK).json({
+                data: {
+                    user
+                }
+            })
+        } catch (error) {
+            next(error)            
+        }
+    }
+    async removeUser(req, res, next){
+        try {
+            await deleteUser.validateAsync(req.body)
+            const { userID } = req.params
+
+            const findUser = await UserModel.findOne({_id : userID})
+            if(!findUser) throw Error.NotFound("user not found")
+
+            const deleteUserr = await UserModel.deleteOne({_id : userID})
+
+            return res.status(HttpStatus.OK).json({
+                data: {
+                    message: "user deleted"
+                }
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+    async deleteUser(req, res, next){
+        try {
+            await deleteUser.validateAsync(req.body)
+            const { _id } = req.user
+
+            const deleteUserr = await UserModel.deleteOne({_id : _id})
+
+            return res.status(HttpStatus.OK).json({
+                data: {
+                    message: "your account deleted"
+                }
+            })
         } catch (error) {
             next(error)
         }
