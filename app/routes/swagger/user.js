@@ -138,6 +138,3 @@
  *                  description: Internal Server Error 
  */
 
-module.exports = {
-    UserAuthRoutes: router
-}

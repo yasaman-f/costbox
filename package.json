@@ -1,11 +1,10 @@
 {
   "name": "financial-management",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon node index.js"
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
@@ -32,5 +31,6 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "twilio": "^4.19.0"
-  }
+  },
+  "description": ""
 }

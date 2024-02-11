@@ -18,3 +18,10 @@
  *  name: Users
  *  description: This section is for user information
  */
+
+/**
+ * @swagger
+ * tags:
+ *  name: Income
+ *  description: This section is for income 
+ */

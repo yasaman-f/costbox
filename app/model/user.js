@@ -11,7 +11,8 @@ const user = new mongoose.Schema({
     profile: { type: String },
     otp: { type: Object, default: { code: 0, expire:0 } },
     role: { type: String, default: "USER" },
-}, {
+    income: { type: String, default: "0", ref:"income" },
+}, { 
     timestamps: true
 });
 

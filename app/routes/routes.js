@@ -1,4 +1,5 @@
 const { checkToken } = require("../middleware/checkToken")
+const { IncomeRoutes } = require("./user/income.routes")
 const { HomeRoutes } = require("./main/main")
 const { UserRoutes } = require("./user/authentication.routes")
 const { CategoriesRoutes } = require("./user/categories.routes")
@@ -10,6 +11,7 @@ router.use("/", HomeRoutes)
 router.use("/user", UserRoutes)
 router.use("/category", checkToken, CategoriesRoutes)
 router.use("/users", checkToken, UsersRoutes)
+router.use("/income", checkToken, IncomeRoutes)
 
 module.exports = {
     AllRoutes: router
