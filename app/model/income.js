@@ -1,9 +1,9 @@
 const { default: mongoose } = require("mongoose")
 
 const income = new mongoose.Schema({
-    withWhat: { type: String, required: true },
+    withWhat: { type: String },
     howMuch: { type: String, default: "0", required: true },
-    description: { type: String, required: true },
+    description: { type: String },
     userID: { type: mongoose.Types.ObjectId },
  }, {
     timestamps: true

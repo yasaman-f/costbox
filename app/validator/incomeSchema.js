@@ -1,7 +1,7 @@
 const joi = require("@hapi/joi")
 
 const addIncomeSchema = joi.object({
-    withWhat: joi.string().regex(/(cart|cash)/i).error(new Error("the type is incorrect")),
+    withWhat: joi.string().regex(/(bank|cash)/i).error(new Error("the type is incorrect")),
     howMuch: joi.string().min(5).error(new Error("Income should not be less than 10,000 Rials")),
     description:  joi.string().min(3).max(50).error(new Error("the description is incorrect"))
 });
