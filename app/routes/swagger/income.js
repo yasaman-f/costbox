@@ -10,6 +10,15 @@
  *                  enum:
  *                      -   Cash
  *                      -   Bank
+ *          WithWhaT:
+ *              type: array
+ *              description: In this section, the user specifies from which account he wants to spend.
+ *              items: 
+ *                  type: string
+ *                  enum:
+ *                      -   Cash
+ *                      -   Bank
+ *                      -   Save
  *          Type:
  *              type: array
  *              description: In this section, we can switch money between cards, cash and saving.
@@ -44,9 +53,12 @@
  *          SpendIncome:
  *              type: object
  *              required:
+ *                  -   WithWhat
  *                  -   howMuch
  *                  -   categoryID
  *              properties:
+ *                  WithWhat:
+ *                      $ref: '#/components/schemas/WithWhaT'
  *                  howMuch:
  *                      type: string
  *                      description: In this section, the user can explain how to spend her income

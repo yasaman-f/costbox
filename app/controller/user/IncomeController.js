@@ -22,8 +22,20 @@ class IncomeController extends Controller{
 
             let howMuch = (parseInt(data.howMuch)) + (parseInt(userFound.income))
             howMuch = String(howMuch) 
-
             const updateUser = await UserModel.updateOne({_id}, {$set: {income: howMuch}})
+
+            if( data.withWhat == "Bank"){
+                let HowMuch = (parseInt(data.howMuch)) + (parseInt(userFound.bank))
+                HowMuch = String(HowMuch) 
+                const UpdateUser = await UserModel.updateOne({_id}, {$set: {bank: HowMuch}})
+            }
+
+            if( data.withWhat == "Cash"){
+                let HowMuch = (parseInt(data.howMuch)) + (parseInt(userFound.cash))
+                HowMuch = String(HowMuch) 
+                const UpdateUser = await UserModel.updateOne({_id}, {$set: {cash: HowMuch}})
+            }
+
             data.howMuch = `+${data.howMuch}`
             const addIncome = await IncomeModel.create(data)
 
@@ -39,7 +51,7 @@ class IncomeController extends Controller{
     async spendIncome(req, res, next){
         try {
             await spendSchema.validateAsync(req.body)
-            let {howMuch , categoryID } = req.body
+            let {howMuch , categoryID, WithWhat } = req.body
 
             const findCategory = await CategoryModel.findOne({_id: categoryID})
 
@@ -49,12 +61,51 @@ class IncomeController extends Controller{
             const updateCategory = await CategoryModel.updateOne({_id: categoryID}, {$set: {amountOfSpend: newAmount}})
 
             const userFound = await UserModel.findOne({_id: req.user._id})
-            let newIncome = parseInt(userFound.income) - parseInt(howMuch)
-            newIncome = String(newIncome)
-            const updateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {income: newIncome}})
+            if( WithWhat == "Cash" || WithWhat == "Bank"){
+                if((parseInt(howMuch) > parseInt(userFound.income))) throw Error.BadRequest("This amount is more than the money in your account")
+
+                let newIncome = parseInt(userFound.income) - parseInt(howMuch)
+                newIncome = String(newIncome)
+
+                const updateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {income: newIncome}})
+            }
+
+            if( WithWhat == "Cash" ){
+                if((parseInt(howMuch) > parseInt(userFound.cash))) throw Error.BadRequest("This amount is more than the money in your account")
+
+                let newCash = parseInt(userFound.cash) - parseInt(howMuch)
+                newCash = String(newCash)
+
+                const updateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {cash: newCash}})
+                req.body.description = "This cost has been removed from the cash"
+
+            }
+
+            if( WithWhat == "Bank" ){
+                if((parseInt(howMuch) > parseInt(userFound.bank))) throw Error.BadRequest("This amount is more than the money in your account")
+
+                let newBank = parseInt(userFound.bank) - parseInt(howMuch)
+                newBank = String(newBank)
+
+                const updateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {bank: newBank}})
+                req.body.description = "This cost has been removed from the bank account"
+
+            }
+
+            if(WithWhat == "Save") {
+                if((parseInt(howMuch) > parseInt(userFound.saving))) throw Error.BadRequest("This amount is more than the money in your account")
+
+                let newSaving = parseInt(userFound.saving) - parseInt(howMuch)
+                newSaving = String(newSaving)
+
+                const updateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {saving: newSaving}})
+                req.body.description = "This cost has been removed from the saving"
+
+
+            }
 
             howMuch = `-${howMuch}`
-            const spendIncome = await IncomeModel.create({howMuch, categoryID})
+            const spendIncome = await IncomeModel.create({howMuch, categoryID, description: req.body.description})
             return res.status(HttpStatus.CREATED).json({
                 data: {
                     message: "Your expenses have been added to your account history"
@@ -68,6 +119,21 @@ class IncomeController extends Controller{
     async transferIncome(req, res, next){
         try {
             await transferSchema.validateAsync(req.body)
+            const { type, howMuch } = req.body
+
+            const userFound = await UserModel.findOne({_id: req.user._id})
+
+            if( type == "Cash to save" || type == "Bank to save"){
+                let newSaving = parseInt(howMuch) + parseInt(userFound.saving)
+                newSaving = String(newSaving)
+                const updateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {saving: newSaving}})
+                let newIncome = parseInt(userFound.income) - parseInt(howMuch)
+                newIncome = String(newIncome)
+                const UpdateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {income: newIncome}})
+            }
+            
+
+
             return res.status(HttpStatus.CREATED).json({
                 data: {
                     message

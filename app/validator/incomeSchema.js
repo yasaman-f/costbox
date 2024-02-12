@@ -7,6 +7,7 @@ const addIncomeSchema = joi.object({
 });
 
 const spendSchema = joi.object({
+    WithWhat: joi.string().regex(/(bank|cash|save)/i).error(new Error("the type is incorrect")),
     howMuch: joi.string().min(5).error(new Error("What did you buy for less than 10,000 Rials? :)")),
     categoryID: joi.string().regex(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i).error(new Error("the categoryID is incorrect"))
 })
