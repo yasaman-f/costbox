@@ -13,7 +13,7 @@ const spendSchema = joi.object({
 })
 
 const transferSchema = joi.object({
-    type: joi.string().regex(/(Cash to bank | Bank to cash | Cash to Save | Bank to save)/i).error(new Error("the type is incorrect")),
+    type: joi.string().regex(/(Cash to bank|Bank to cash|Cash to Save|Bank to save)/i).error(new Error("the type is incorrect")),
     howMuch: joi.string().min(5).error(new Error("Income should not be less than 10,000 Rials")),
 
 })

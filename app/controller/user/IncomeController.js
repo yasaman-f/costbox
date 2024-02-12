@@ -119,24 +119,63 @@ class IncomeController extends Controller{
     async transferIncome(req, res, next){
         try {
             await transferSchema.validateAsync(req.body)
-            const { type, howMuch } = req.body
+            let { type, howMuch } = req.body
 
             const userFound = await UserModel.findOne({_id: req.user._id})
 
-            if( type == "Cash to save" || type == "Bank to save"){
-                let newSaving = parseInt(howMuch) + parseInt(userFound.saving)
-                newSaving = String(newSaving)
-                const updateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {saving: newSaving}})
-                let newIncome = parseInt(userFound.income) - parseInt(howMuch)
-                newIncome = String(newIncome)
-                const UpdateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {income: newIncome}})
+            if(type == "Cash to bank" || type == "Bank to cash"){
+                if(type == "Cash to bank"){
+                    if((parseInt(howMuch) > parseInt(userFound.cash))) throw Error.BadRequest("This amount is more than the money in your account")
+                    let newCash = parseInt(userFound.cash) - parseInt(howMuch)
+                    let newBank = parseInt(userFound.bank) + parseInt(howMuch)
+                    newCash = String(newCash)
+                    newBank = String(newBank)
+                    const updateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {cash: newCash, bank: newBank}})
+                    req.body.description = "transfer money from cash to bank accout"
+                }else{
+                    if((parseInt(howMuch) > parseInt(userFound.bank))) throw Error.BadRequest("This amount is more than the money in your account")
+                    let newBank = parseInt(userFound.bank) - parseInt(howMuch)
+                    let newCash = parseInt(userFound.cash) + parseInt(howMuch)
+                    newCash = String(newCash)
+                    newBank = String(newBank)
+                    const updateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {cash: newCash, bank: newBank}})
+                    req.body.description = "transfer money from bank accout to cash"
+
+                }
+
+            }
+
+            if( type == "Cash to Save" || type == "Bank to save"){
+                if(type == "Cash to Save"){
+                    if((parseInt(howMuch) > parseInt(userFound.cash))) throw Error.BadRequest("This amount is more than the money in your account")
+                    let newCash = parseInt(userFound.cash) - parseInt(howMuch)
+                    let newIncome = parseInt(userFound.income) - parseInt(howMuch)
+                    let newSaving = parseInt(howMuch) + parseInt(userFound.saving) 
+                    newCash = String(newCash)
+                    newIncome = String(newIncome)
+                    newSaving = String(newSaving)
+                    const updateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {cash: newCash, income: newIncome, saving: newSaving}})
+                    req.body.description = "transfer money from cash to saving"
+                }else{
+                    if((parseInt(howMuch) > parseInt(userFound.bank))) throw Error.BadRequest("This amount is more than the money in your account")
+                    let newBank = parseInt(userFound.bank) - parseInt(howMuch)
+                    let newIncome = parseInt(userFound.income) - parseInt(howMuch)
+                    let newSaving = parseInt(howMuch) + parseInt(userFound.saving) 
+                    newBank = String(newBank)
+                    newIncome = String(newIncome)
+                    newSaving = String(newSaving)
+                    const updateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {bank: newBank, income: newIncome, saving: newSaving}})
+                    req.body.description = "transfer money from bank account to saving"
+
+                }
             }
             
-
+            howMuch = `=>${howMuch}`
+            const transfer = await IncomeModel.create({type, howMuch, description: req.body.description})
 
             return res.status(HttpStatus.CREATED).json({
                 data: {
-                    message
+                    message: "The desired amount of money was deposited to the desired account"
                 }
             })
             
