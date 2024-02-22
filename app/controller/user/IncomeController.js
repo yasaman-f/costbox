@@ -105,7 +105,7 @@ class IncomeController extends Controller{
             }
 
             howMuch = `-${howMuch}`
-            const spendIncome = await IncomeModel.create({howMuch, categoryID, description: req.body.description})
+            const spendIncome = await IncomeModel.create({howMuch, categoryID, description: req.body.description, userID: req.user._id})
             return res.status(HttpStatus.CREATED).json({
                 data: {
                     message: "Your expenses have been added to your account history"
@@ -171,7 +171,7 @@ class IncomeController extends Controller{
             }
             
             howMuch = `=>${howMuch}`
-            const transfer = await IncomeModel.create({type, howMuch, description: req.body.description})
+            const transfer = await IncomeModel.create({type, howMuch, description: req.body.description, userID: req.user._id})
 
             return res.status(HttpStatus.CREATED).json({
                 data: {

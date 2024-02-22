@@ -25,3 +25,10 @@
  *  name: Income
  *  description: This section is for income 
  */
+
+/**
+ * @swagger
+ * tags:
+ *  name: History
+ *  description: This section is for history 
+ */
