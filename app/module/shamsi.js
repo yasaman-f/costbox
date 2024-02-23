@@ -8,11 +8,10 @@ function DateConverter(shamsiDate) {
     const month = (date.getMonth() + 1);
     const day = date.getDate();
     
-    const result = [year, month < 10 ? month : month, day < 10 ? '0' + day : day];
+    const result = [year, month < 10 ? month : month, day < 10 ?  day : day];
 
     const ResUlt = sundate.j_to_g(result[0], result[1], result[2])
-    console.log(ResUlt);
-    
+    return ResUlt
 }
 
 

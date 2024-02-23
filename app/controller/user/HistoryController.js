@@ -3,7 +3,9 @@ const Controller = require("../MainController")
 const Error = require("http-errors")
 const { checkHistory } = require('../../validator/history')
 const sundate = require("sundate");
-const { IncomeModel } = require('../../model/income')
+const { IncomeModel } = require('../../model/income');
+const { checkDate } = require('../../utils/functions');
+const { DateConverter } = require('../../module/shamsi');
 
 
 
@@ -12,7 +14,9 @@ class HistoryController extends Controller{
     async checkHistory(req, res, next){
         try {
             await checkHistory.validateAsync(req.body)
-            const { fromDate, toDate, type } = req.body
+            let { fromDate, toDate, type } = req.body
+            fromDate = DateConverter(fromDate)
+            toDate = DateConverter(toDate)
             const {_id} = req.user
 
             let response = []
@@ -54,12 +58,13 @@ class HistoryController extends Controller{
                         response.push(key)
                     }
                 })
+            }
+            response = checkDate(response, fromDate, toDate)
             return res.status(HttpStatus.OK).json({
                 data: {
                     message: response
                 }
             })
-        }
         } catch (error) {
             next(error)
         }
