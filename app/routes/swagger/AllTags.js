@@ -32,3 +32,10 @@
  *  name: History
  *  description: This section is for history 
  */
+
+/**
+ * @swagger
+ * tags:
+ *  name: Set-Time
+ *  description: In this section, the user can create an event for himself on Google Calendar
+ */
