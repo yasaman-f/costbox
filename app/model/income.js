@@ -5,6 +5,7 @@ const income = new mongoose.Schema({
     howMuch: { type: String, default: "0", required: true },
     description: { type: String },
     userID: { type: mongoose.Types.ObjectId },
+    categoryID: { type: mongoose.Types.ObjectId },
  }, {
     timestamps: true
 });

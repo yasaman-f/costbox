@@ -36,6 +36,13 @@
 /**
  * @swagger
  * tags:
+ *  name: CircleChart
+ *  description: This section is for seeing the pie chart of user expenses
+ */
+
+/**
+ * @swagger
+ * tags:
  *  name: Set-Time
  *  description: In this section, the user can create an event for himself on Google Calendar
  */

@@ -19,13 +19,15 @@ class HistoryController extends Controller{
             toDate = DateConverter(toDate)
             const {_id} = req.user
 
+            const findHistory = await IncomeModel.find({userID: _id, createdAt: { $gte: fromDate, $lte: toDate }});
+
             let response = []
 
             if( type == "Total history") {
-                response = await IncomeModel.find({userID: _id})
+                response = findHistory
 
             }else if (type == "Income history") {
-                const incomeFound = await IncomeModel.find({userID: _id})
+                const incomeFound = findHistory
                 response = []
                 incomeFound.forEach(key => {
                     if(key.howMuch[0] == "+"){
@@ -34,7 +36,7 @@ class HistoryController extends Controller{
                 })
 
             }else if (type == "Spend history") {
-                const incomeFound = await IncomeModel.find({userID: _id})
+                const incomeFound = findHistory
                 response = []
                 incomeFound.forEach(key => {
                     if(key.howMuch[0] == "-"){
@@ -42,7 +44,7 @@ class HistoryController extends Controller{
                     }
                 })
             }else if (type == "Transfer history") {
-                const incomeFound = await IncomeModel.find({userID: _id})
+                const incomeFound = findHistory
                 response = []
                 incomeFound.forEach(key => {
                     if(key.howMuch[0] == "="){
@@ -50,7 +52,7 @@ class HistoryController extends Controller{
                     }
                 })
             }else if (type == "Save history") {
-                const incomeFound = await IncomeModel.find({userID: _id})
+                const incomeFound = findHistory
                 response = []
                 incomeFound.forEach(key => {
                     const indeX = key.description.length - 1
@@ -59,7 +61,6 @@ class HistoryController extends Controller{
                     }
                 })
             }
-            response = checkDate(response, fromDate, toDate)
             return res.status(HttpStatus.OK).json({
                 data: {
                     message: response

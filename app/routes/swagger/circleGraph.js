@@ -2,55 +2,54 @@
  * @swagger
  *  components:
  *      schemas:
- *          TypE:
+ *          SelectRange:
  *              type: array
- *              description: In this section, you choose which part of history I will return to you
+ *              description: In this section, the user enters the date they want to see their pie chart
  *              items: 
  *                  type: string
  *                  enum:
- *                      -   Total history
- *                      -   Income history
- *                      -   Spend history
- *                      -   Transfer history
- *                      -   Save history
+ *                      -   Today
+ *                      -   This week
+ *                      -   This month
+ *                      -   This year
+ *                      -   All time
+ *                      -   Custom range
  */ 
 
 /**
  * @swagger
  *  components:
  *      schemas:
- *          CheckHistory:
+ *          PieChart:
  *              type: object
  *              required:
- *                  -   fromDate
- *                  -   toDate
- *                  -   type
+ *                  -   range
  *              properties:
+ *                  range:
+ *                       $ref: '#/components/schemas/SelectRange'
  *                  fromDate:
  *                      type: string
- *                      description: the start date for search on dataBase
+ *                      description: the start date for return circle chart
  *                  toDate:
  *                      type: string
- *                      description: the end date for search on dataBase
- *                  type:
- *                       $ref: '#/components/schemas/TypE'
+ *                      description: the end date for return circle chart
  */
 
 /**
  * @swagger
- *  /history/search:
+ *  /analyze/pieChart:
  *      post:
- *          tags: [History]
+ *          tags: [CircleChart]
  *          description: Here you enter the desired date and search in the section you like
  *          requestBody:
  *              required: true
  *              content: 
  *                  application/x-www-form-urlencoded:
  *                      schema:
- *                          $ref: '#/components/schemas/CheckHistory'
+ *                          $ref: '#/components/schemas/PieChart'
  *                  application/json:
  *                      schema:
- *                          $ref: '#/components/schemas/CheckHistory'
+ *                          $ref: '#/components/schemas/PieChart'
  *          responses:
  *              201: 
  *                  description: Success

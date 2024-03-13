@@ -13,11 +13,9 @@ class SetTimeController extends Controller{
             await AddSetTimeSchema.validateAsync(req.body)
             const { type, when, description, startDate, endDate  } = req.body
             let newDate = DateConverter(when)
-            console.log(newDate);
             if( newDate[1]<10 ) newDate[1] = "0" + newDate[1]
             if( newDate[2]<10 ) newDate[2] = "0" + newDate[2]
             newDate = (`${newDate[0]}-${newDate[1]}-${newDate[2]}`);
-            console.log(newDate);
             let summary = []
             if(type == "Debtor") {
                 summary = "Debtor"

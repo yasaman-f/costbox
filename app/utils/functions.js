@@ -56,33 +56,15 @@ function removeExtraData(data, fixedData = []) {
 }
 
 
-function Appearance(DAate) {
-    const date = new Date(DAate);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1);
-    const day = date.getDate();
-    const result = [year, month < 10 ? month : month, day < 10 ? day : day];
-    return result
-}
+// function Appearance(DAate) {
+//     const date = new Date(DAate);
+//     const year = date.getFullYear();
+//     const month = (date.getMonth() + 1);
+//     const day = date.getDate();
+//     const result = [year, month < 10 ? month : month, day < 10 ? day : day];
+//     return result
+// }
 
-function checkDate(TotalList, fromDate, toDate) {
-    const ReSuLT = []
-
-    TotalList.forEach(key => {
-        console.log(key.howMuch);
-        const date = new Date(key.createdAt);
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1);
-        const day = date.getDate();
-        const result = [year, month < 10 ? month : month, day < 10 ? day : day];
-        if (result[0] > fromDate[0] || result[1] > fromDate[1] || result[2] > fromDate[2]) {
-            if (result[0] < toDate[0] || result[1] < toDate[1] || result[2] < toDate[2]) {
-                ReSuLT.push(key)
-            }
-        }
-    })
-    return ReSuLT
-}
 
 
 
@@ -92,5 +74,4 @@ module.exports = {
     RandomNumber,
     AccessToken,
     removeExtraData,
-    checkDate
 }
