@@ -4,6 +4,7 @@ const Error = require("http-errors");
 const { IncomeModel } = require('../../model/income');
 const { PieChart } = require('../../validator/circleGraphSchema');
 const { percentage, nameOfCategory, finalPercentage } = require('../../middleware/percentage');
+const { DateConverter } = require('../../module/shamsi');
 
 
 
@@ -26,8 +27,13 @@ class circlrGraphController extends Controller{
                 if (fromDate != "" || toDate != "") throw new Error.BadRequest("When you choose This week, you can't click on the desired range. To select the desired date, you must to click on the custom range.")
                 result = await this.ThisWeek(req.user._id)
             }else if(range == "This year"){
-                if (fromDate != "" || toDate != "") throw new Error.BadRequest("When you choose This week, you can't click on the desired range. To select the desired date, you must to click on the custom range.")
+                if (fromDate != "" || toDate != "") throw new Error.BadRequest("When you choose This year, you can't click on the desired range. To select the desired date, you must to click on the custom range.")
                 result = await this.ThisYear(req.user._id)
+            }else if(range == "All time"){
+                if (fromDate != "" || toDate != "") throw new Error.BadRequest("When you choose All time, you can't click on the desired range. To select the desired date, you must to click on the custom range.")
+                result = await this.AllTime(req.user._id)
+            }else{
+                result = await this.customRange(fromDate, toDate, req.user._id)
             }
             return res.status(HttpStatus.OK).json({
                 data: {
@@ -39,7 +45,7 @@ class circlrGraphController extends Controller{
             next(error)
         }
     }
-    
+    .0
     async Today (id){
         const today = new Date();
 
@@ -130,6 +136,35 @@ class circlrGraphController extends Controller{
         
 
         const List = await IncomeModel.find({userID:id , createdAt: { $gte: fromDate, $lte: ToDate }})
+        let response = []
+        List.forEach(key => {
+            if(key.howMuch[0] == "-"){
+                response.push(key)
+            }  })
+        const listOfPercent = percentage(response)
+        const resUL = await nameOfCategory(listOfPercent)
+        const resULT = finalPercentage(resUL)
+        return resULT
+    }
+
+    async AllTime(id){
+        const List = await IncomeModel.find({userID:id})
+        let response = []
+        List.forEach(key => {
+            if(key.howMuch[0] == "-"){
+                response.push(key)
+            }  })
+        const listOfPercent = percentage(response)
+        const resUL = await nameOfCategory(listOfPercent)
+        const resULT = finalPercentage(resUL)
+        return resULT
+    }
+
+    async customRange(fromDate, toDate, id){
+        let FromDate = DateConverter(fromDate)
+        let ToDate = DateConverter(toDate)
+
+        const List = await IncomeModel.find({userID:id , createdAt: { $gte: FromDate, $lte: ToDate }})
         let response = []
         List.forEach(key => {
             if(key.howMuch[0] == "-"){

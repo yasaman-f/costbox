@@ -36,5 +36,8 @@
     "swagger-ui-express": "^5.0.0",
     "twilio": "^4.19.0"
   },
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1"
+  }
 }
