@@ -4,7 +4,7 @@ const { UserModel } = require('../model/user');
 
 async function sendTwilioMessage(toPhoneNumber) {
     const accountSid = 'AC09d8a164d7fce3a3f0aad2e967fd4fd8';
-    const authToken = '722c7df195a29604d61697ed28fe6f18';
+    const authToken = '83d85ac77e51423e607693d215a9fcfb';
     const client = new twilio(accountSid, authToken);
     const verificationCode = RandomNumber()
     const updateUser = await UserModel.updateOne({phoneNumber: toPhoneNumber}, {$set: {otp: { code: verificationCode, expire: (new Date().getTime() + 120000)}}})

@@ -4,6 +4,7 @@ const Error = require("http-errors")
 const { createCategory, editCategory, removeCategory } = require('../../validator/categorySchema')
 const { CategoryModel } = require('../../model/category')
 const { removeExtraData } = require('../../utils/functions')
+const { UserModel } = require('../../model/user')
 
 
 class CategoryController extends Controller{
@@ -14,9 +15,22 @@ class CategoryController extends Controller{
             const data = req.body
             data.userID = _id
             removeExtraData(data)
-            const findCategory = await CategoryModel.findOne({title: data.title})
-            if(findCategory) throw Error.BadRequest("this category alreadt exist")
+            const findCategory = await CategoryModel.find({title: data.title})
+            if(findCategory){
+                findCategory.forEach(key => {
+                    if(key.userID.toString() == _id.toString()) throw Error.BadRequest("this category alreadt exist")
+                })
+            }
+            
             const CreateCategory = await CategoryModel.create(data)
+
+            const updateUser = await UserModel.findOne({_id})
+            const UserCategory = updateUser.categories
+            UserCategory.push(CreateCategory._id)
+            const UpdateUser = await UserModel.updateOne({_id}, {$set: {categories: UserCategory}})
+            if(!UpdateUser.modifiedCount) throw Error.InternalServerError("we cant create category.")
+
+        
             if(data.parent){
                 console.log(CreateCategory._id);
                 const findParent = await CategoryModel.findOne({_id: data.parent})
@@ -40,6 +54,7 @@ class CategoryController extends Controller{
             const { search } = req.query
             const dataBase = {}
             if (search) dataBase['$text'] = { $search: search }  
+            dataBase.userID = req.user._id 
             const categories = await CategoryModel.find(dataBase)
             const iterateCategories = async (categories) => {
                 const result = []

@@ -46,3 +46,10 @@
  *  name: Set-Time
  *  description: In this section, the user can create an event for himself on Google Calendar
  */
+
+/**
+ * @swagger
+ * tags:
+ *  name: RBAC
+ *  description: In this section, the owner set permissions and role
+ */
