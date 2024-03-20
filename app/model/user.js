@@ -15,6 +15,7 @@ const user = new mongoose.Schema({
     saving: { type: String, default: "0" },
     bank: { type: String, default: "0" },
     cash: { type: String, default: "0" },
+    isVerified  : { type: Boolean, default: false },
 }, { 
     timestamps: true
 });

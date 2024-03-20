@@ -3,7 +3,8 @@ const dotenv = require("dotenv").config()
 const { UserModel } = require("../model/user")
 const jwt = require("jsonwebtoken")
 const Error = require("http-errors")
-
+const path = require("path")
+const fs = require("fs")
 
 const secretKey = process.env.SECRET_KEY
 
@@ -65,7 +66,13 @@ function removeExtraData(data, fixedData = []) {
 //     return result
 // }
 
-
+function deleteFileInPublic(fileAddress) {
+    console.log(fileAddress);
+    if (fileAddress) {
+        const pathFile = path.join(__dirname, "..", "..", "public", fileAddress)
+        if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile)
+    }
+}
 
 
 module.exports = {
@@ -74,4 +81,5 @@ module.exports = {
     RandomNumber,
     AccessToken,
     removeExtraData,
+    deleteFileInPublic
 }

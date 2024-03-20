@@ -53,13 +53,8 @@ class IncomeController extends Controller{
             await spendSchema.validateAsync(req.body)
             let {howMuch , categoryID, WithWhat } = req.body
 
-            const findCategory = await CategoryModel.findOne({_id: categoryID})
-
-            if(!findCategory || ((findCategory.userID.toString()) != (req.user._id.toString()))) throw Error.BadRequest("This category does not exist")
-            let newAmount = parseInt(howMuch) + parseInt(findCategory.amountOfSpend)
-            newAmount = String(newAmount)
-            const updateCategory = await CategoryModel.updateOne({_id: categoryID}, {$set: {amountOfSpend: newAmount}})
-
+            
+            
             const userFound = await UserModel.findOne({_id: req.user._id})
             if( WithWhat == "Cash" || WithWhat == "Bank"){
                 if((parseInt(howMuch) > parseInt(userFound.income))) throw Error.BadRequest("This amount is more than the money in your account")
@@ -75,12 +70,12 @@ class IncomeController extends Controller{
 
                 let newCash = parseInt(userFound.cash) - parseInt(howMuch)
                 newCash = String(newCash)
-
+                
                 const updateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {cash: newCash}})
                 req.body.description = "This cost has been removed from the cash"
-
+                
             }
-
+            
             if( WithWhat == "Bank" ){
                 if((parseInt(howMuch) > parseInt(userFound.bank))) throw Error.BadRequest("This amount is more than the money in your account")
 
@@ -91,21 +86,28 @@ class IncomeController extends Controller{
                 req.body.description = "This cost has been removed from the bank account"
 
             }
-
+            
             if(WithWhat == "Save") {
                 if((parseInt(howMuch) > parseInt(userFound.saving))) throw Error.BadRequest("This amount is more than the money in your account")
-
+                
                 let newSaving = parseInt(userFound.saving) - parseInt(howMuch)
                 newSaving = String(newSaving)
-
+                
                 const updateUser = await UserModel.updateOne({_id: req.user._id}, {$set: {saving: newSaving}})
                 req.body.description = "This cost has been removed from the saving"
-
-
+                
+                
             }
-
+            const findCategory = await CategoryModel.findOne({_id: categoryID})
+            if(!findCategory || ((findCategory.userID.toString()) != (req.user._id.toString()))) throw Error.BadRequest("This category does not exist")
+            let newAmount = parseInt(howMuch) + parseInt(findCategory.amountOfSpend)
+            newAmount = String(newAmount)
+            const updateCategory = await CategoryModel.updateOne({_id: categoryID}, {$set: {amountOfSpend: newAmount}})
+            
             howMuch = `-${howMuch}`
             const spendIncome = await IncomeModel.create({howMuch, categoryID, description: req.body.description, userID: req.user._id})
+
+
             return res.status(HttpStatus.CREATED).json({
                 data: {
                     message: "Your expenses have been added to your account history"

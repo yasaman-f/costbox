@@ -19,9 +19,22 @@ async signUp(req, res, next){
             throw new Error.BadRequest("Repeating password does not match with password")
         }
         const findUsername = await UserModel.findOne({userName : data.userName})
-        if(findUsername) throw new Error.BadRequest("This username already exists")
+        if(findUsername){
+            if(findUsername.isVerified == true){
+                throw new Error.BadRequest("This username already exists")
+            }else{
+                await UserModel.deleteOne({_id: findUsername._id})
+            }
+        }
         const findUser = await UserModel.findOne({email : data.email})
-        if(findUser) throw new Error.BadRequest("This user already exists")
+        if(findUser){
+            if(findUser?.isVerified == true){
+                throw new Error.BadRequest("This user already exists")
+            }else{
+                await UserModel.deleteOne({_id: findUser._id})
+            }
+        }
+
         const code = RandomNumber() 
         data.otp =  { code, expire: (new Date().getTime() + 120000)}
         
@@ -37,6 +50,7 @@ async signUp(req, res, next){
             }
           })
     } catch (error) {
+        console.log(error);
         next(error)
     }
 }
@@ -48,6 +62,7 @@ async verifyEmail(req, res , next){
         const findUser = await UserModel.findOne({email})
         let Access = ""
         if(findUser.otp.code == code){
+            const updateUser = await UserModel.updateOne({_id: findUser._id}, {$set: {isVerified: true}})
             const access = await AccessToken(findUser._id)
             Access = access
         }else{
@@ -73,6 +88,7 @@ async login(req, res, next){
         const { email, password  } = req.body
         const findUser = await UserModel.findOne({email})
         if(!findUser) throw Error.NotFound("No users were found with the entered information")
+        if(findUser.isVerified == false) throw Error.NotFound("This user is not verified. Please sign up again")
         const checkPass = verifyPassword(password, findUser.password)
         let Access = ""
         if(checkPass == true){
@@ -126,6 +142,7 @@ async checkotp (req, res, next){
         let Access = ""
         if (+findUser.otp.expire < (Date.now())) throw Error.Unauthorized('code is expire please try again')
         if(findUser.otp.code == code){
+            if(findUser.isVerified == false) throw Error.NotFound("This user is not verified. Please sign up again")
             const access = await AccessToken(findUser._id)
             Access = access
         }else{

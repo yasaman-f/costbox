@@ -46,7 +46,7 @@ class RoleController extends Controller{
     async removeRole(req, res, next){
         try {
             const {field} = req.params;
-            const role = await this.findRoleByTitleOrID(field)
+            const role = await this.findRoleByID(field)
             const remove = await RoleModel.deleteOne({_id: role._id})
             if(!remove.deletedCount) throw Error.InternalServerError("delete role failed")
             return res.status(HttpStatus.OK).json({

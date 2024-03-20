@@ -4,7 +4,7 @@ const Error = require("http-errors")
 const path = require("path")
 const { informationSchema, deleteUser } = require('../../validator/userSchema')
 const { UserModel } = require('../../model/user')
-const { AccessToken } = require('../../utils/functions')
+const { AccessToken, deleteFileInPublic } = require('../../utils/functions')
 const dotenv = require("dotenv")
 const { default: mongoose } = require('mongoose')
 const ObjectId = mongoose.Types.ObjectId
@@ -22,27 +22,38 @@ class UserController extends Controller{
             if(!_id) throw Error.BadRequest("please signUp/login")
             const findUser = await UserModel.findOne(_id)
 
+        
+            const { firstName, lastName, userName, phoneNumber, email } = req.body
+            const data = { firstName, lastName, userName, phoneNumber, email }
+
+            const findNumber = await UserModel.findOne({phoneNumber})
+            const finduserName = await UserModel.findOne({userName}) 
+
+            if(!(findUser.phoneNumber)){
+                if( (findNumber || finduserName) != null ){
+                    if((findNumber == null)){
+                        if(finduserName?._id.toString() != findUser._id.toString()) throw Error.BadRequest("user already exist")
+                    }
+                    if((finduserName == null)){
+                       if(findNumber?._id.toString() != findUser._id.toString() ) throw Error.BadRequest("user already Exist")
+                 }
+                }
+            }else{
+                console.log(findNumber?._id?.toString(), findUser._id.toString());
+                console.log(finduserName?._id?.toString(), findUser._id.toString());
+                if(findNumber?._id?.toString() != findUser._id.toString()) throw Error.BadRequest("user already Exist")
+                if(finduserName?._id?.toString() != findUser._id.toString()) throw Error.BadRequest("user already Exist")
+            }
+           
+            
             if( userValidate.fileUploadPath && userValidate.filename){
                 req.body.image = path.join(userValidate.fileUploadPath, userValidate.filename)
                 req.body.image = req.body.image?.replace(/\\/g, "/")
                 req.body.image = `${urL}${port}/${req.body.image}`
             }
-
-            const { firstName, lastName, userName, phoneNumber, email } = req.body
-            const data = { firstName, lastName, userName, phoneNumber, email }
             data.profile = req.body.image
 
-            const findNumber = await UserModel.findOne({phoneNumber})
-            const finduserName = await UserModel.findOne({userName})
             
-            if( (findNumber || finduserName) != null ){
-                if(findNumber == null){
-                    if(finduserName?._id.valueOf() !== findUser._id.valueOf()) throw Error.BadRequest("user already exist")
-                }
-                if(finduserName == null){
-                    if(findNumber?._id.valueOf() != findUser._id.valueOf() ) throw Error.BadRequest("user already exist")
-                }
-            }
             const createUser = await UserModel.updateOne({_id : findUser._id}, {$set: data})
 
             const access = await AccessToken(_id)
@@ -54,6 +65,9 @@ class UserController extends Controller{
                 }
         }) 
         } catch (error) {
+            req.body.image = path.join(req.body.fileUploadPath, req.body.filename)
+            deleteFileInPublic(req.body.image)
+            console.log(req.body.image);
             next(error)
         }
     }
